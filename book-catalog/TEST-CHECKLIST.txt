@@ -1,0 +1,11 @@
+CHECKLIST
+1. mvn clean install
+2. cd web
+3. mvn jetty:run
+4. Open http://localhost:8080/
+5. Search: field=title, q=1984 -> 1984
+6. Search: field=author, q=George Orwell -> 1984
+7. Search: field=year, q=1949 -> 1984
+8. Open book -> add comment -> it appears immediately
+9. Delete new comment -> succeeds within 24h
+10. API: http://localhost:8080/api/books
