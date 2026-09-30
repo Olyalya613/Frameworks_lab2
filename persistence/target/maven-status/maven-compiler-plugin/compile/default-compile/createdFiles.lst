@@ -1,0 +1,5 @@
+ua\edu\catalog\persistence\JdbcCatalogRepository$Search.class
+ua\edu\catalog\persistence\Db.class
+ua\edu\catalog\persistence\JdbcCatalogRepository.class
+ua\edu\catalog\persistence\PersistenceProvider.class
+ua\edu\catalog\persistence\JdbcCommentRepository.class

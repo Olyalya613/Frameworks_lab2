@@ -1,0 +1,10 @@
+ua\edu\catalog\core\service\CatalogService.class
+ua\edu\catalog\core\exception\ConflictException.class
+ua\edu\catalog\core\service\CommentService.class
+ua\edu\catalog\core\model\PageRequest.class
+ua\edu\catalog\core\model\Comment.class
+ua\edu\catalog\core\model\Page.class
+ua\edu\catalog\core\port\CommentRepositoryPort.class
+ua\edu\catalog\core\port\CatalogRepositoryPort.class
+ua\edu\catalog\core\model\Book.class
+ua\edu\catalog\core\exception\NotFoundException.class
