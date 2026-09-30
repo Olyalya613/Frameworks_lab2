@@ -41,6 +41,17 @@ mvn jetty:run
 ## Архітектура
 `web` має `persistence` тільки як Maven runtime dependency. Створення persistence adapter виконується у composition root через reflection, тому bytecode web не залежить від persistence і ArchUnit правило це перевіряє.
 
+## Для звіту
+1. `core` не залежить від JDBC/Servlet, щоб бізнес-логіка не була прив'язана до БД чи HTTP та могла тестуватися окремо.
+2. Правило 24 годин знаходиться у `CommentService`, бо це бізнес-правило, а не правило БД чи контролера.
+3. INFO — успішне створення/видалення відгуку; WARN — 4xx; ERROR — 5xx.
+4. Приклад правила для public-конструкторів core:
+```java
+constructors().that().areDeclaredInClassesThat().resideInAPackage("..core..")
+    .should().bePublic();
+```
+
+Для скриншотів: `mvn clean install`, консоль Jetty після створення/видалення відгуку, сторінка каталогу та сторінка книги.
 
 
 ## UI/API mapping

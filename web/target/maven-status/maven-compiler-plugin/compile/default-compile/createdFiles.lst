@@ -1,3 +1,11 @@
-sumdu\edu\ua\web\JavalinBookApp$CreateCommentRequest.class
-sumdu\edu\ua\web\JavalinBookApp.class
-sumdu\edu\ua\web\JavalinBookApp$Services.class
+sumdu\edu\ua\spring\service\CommentApplicationService.class
+sumdu\edu\ua\spring\config\AppConfig.class
+sumdu\edu\ua\spring\repository\CatalogRepositoryBean.class
+sumdu\edu\ua\spring\controller\BookController.class
+sumdu\edu\ua\spring\SpringBookApplication.class
+sumdu\edu\ua\spring\controller\InfoController.class
+sumdu\edu\ua\spring\exception\ApiExceptionHandler.class
+sumdu\edu\ua\spring\component\BeanInspector.class
+sumdu\edu\ua\spring\controller\BookController$CommentRequest.class
+sumdu\edu\ua\spring\repository\CommentRepositoryBean.class
+sumdu\edu\ua\spring\service\BookApplicationService.class
