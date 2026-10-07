@@ -1,2 +1,11 @@
-C:\Users\admin\Downloads\book-catalog-FIXED-search-comments\book-catalog\web\src\main\java\ua\edu\catalog\web\ApiServlet.java
-C:\Users\admin\Downloads\book-catalog-FIXED-search-comments\book-catalog\web\src\main\java\ua\edu\catalog\web\AppInit.java
+C:\Users\admin\Downloads\book-catalog-LAB4-Spring-MVC-ready\book-catalog\web\src\main\java\sumdu\edu\ua\spring\component\BeanInspector.java
+C:\Users\admin\Downloads\book-catalog-LAB4-Spring-MVC-ready\book-catalog\web\src\main\java\sumdu\edu\ua\spring\config\AppConfig.java
+C:\Users\admin\Downloads\book-catalog-LAB4-Spring-MVC-ready\book-catalog\web\src\main\java\sumdu\edu\ua\spring\config\WebConfig.java
+C:\Users\admin\Downloads\book-catalog-LAB4-Spring-MVC-ready\book-catalog\web\src\main\java\sumdu\edu\ua\spring\controller\BookController.java
+C:\Users\admin\Downloads\book-catalog-LAB4-Spring-MVC-ready\book-catalog\web\src\main\java\sumdu\edu\ua\spring\controller\InfoController.java
+C:\Users\admin\Downloads\book-catalog-LAB4-Spring-MVC-ready\book-catalog\web\src\main\java\sumdu\edu\ua\spring\exception\ApiExceptionHandler.java
+C:\Users\admin\Downloads\book-catalog-LAB4-Spring-MVC-ready\book-catalog\web\src\main\java\sumdu\edu\ua\spring\repository\CatalogRepositoryBean.java
+C:\Users\admin\Downloads\book-catalog-LAB4-Spring-MVC-ready\book-catalog\web\src\main\java\sumdu\edu\ua\spring\repository\CommentRepositoryBean.java
+C:\Users\admin\Downloads\book-catalog-LAB4-Spring-MVC-ready\book-catalog\web\src\main\java\sumdu\edu\ua\spring\service\BookApplicationService.java
+C:\Users\admin\Downloads\book-catalog-LAB4-Spring-MVC-ready\book-catalog\web\src\main\java\sumdu\edu\ua\spring\service\CommentApplicationService.java
+C:\Users\admin\Downloads\book-catalog-LAB4-Spring-MVC-ready\book-catalog\web\src\main\java\sumdu\edu\ua\spring\SpringBookApplication.java

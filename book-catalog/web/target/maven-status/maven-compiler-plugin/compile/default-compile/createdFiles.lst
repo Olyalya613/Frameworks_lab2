@@ -1,3 +1,14 @@
-ua\edu\catalog\web\AppInit.class
-ua\edu\catalog\web\ApiServlet.class
-ua\edu\catalog\web\ApiServlet$Action.class
+sumdu\edu\ua\spring\config\AppConfig.class
+sumdu\edu\ua\spring\SpringBookApplication.class
+sumdu\edu\ua\spring\config\WebConfig.class
+sumdu\edu\ua\spring\controller\InfoController.class
+sumdu\edu\ua\spring\component\BeanInspector.class
+sumdu\edu\ua\spring\service\BookApplicationService.class
+sumdu\edu\ua\spring\service\CommentApplicationService.class
+sumdu\edu\ua\spring\repository\CatalogRepositoryBean.class
+sumdu\edu\ua\spring\controller\BookController.class
+sumdu\edu\ua\spring\controller\BookController$BookDetailsResponse.class
+sumdu\edu\ua\spring\exception\ApiExceptionHandler.class
+sumdu\edu\ua\spring\controller\BookController$CommentRequest.class
+sumdu\edu\ua\spring\repository\CommentRepositoryBean.class
+sumdu\edu\ua\spring\controller\BookController$CreateCommentRequest.class
