@@ -1,0 +1,4 @@
+INSERT INTO books(title,author,pub_year) VALUES ('1984','George Orwell',1949),('Clean Code','Robert C. Martin',2008),('Effective Java','Joshua Bloch',2018),('Refactoring','Martin Fowler',2018),('Design Patterns','Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides',1994),('The Pragmatic Programmer','Andrew Hunt, David Thomas',1999);
+-- Demo users only; password values are deliberately unusable placeholders (no authentication implemented).
+INSERT INTO users(username,password,role) VALUES ('Olha','!demo-no-login!','USER'),('Anna','!demo-no-login!','USER'),('Max','!demo-no-login!','USER');
+INSERT INTO comments(book_id,user_id,text,created_at) VALUES (1,1,'Цікава класика!',CURRENT_TIMESTAMP()),(2,1,'Корисна книга для розробників.',CURRENT_TIMESTAMP()),(1,2,'Рекомендую прочитати.',CURRENT_TIMESTAMP()),(3,3,'Чудові приклади Java.',CURRENT_TIMESTAMP());

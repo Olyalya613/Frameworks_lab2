@@ -19,6 +19,7 @@ class CommentServiceTest {
         CatalogRepositoryPort books = new CatalogRepositoryPort() {
             public ua.edu.catalog.core.model.Page<Book> find(String q,String f,ua.edu.catalog.core.model.PageRequest p){throw new UnsupportedOperationException();}
             public Optional<Book> findById(long id){return Optional.of(new Book(id,"Book","Author",2026));}
+            public Book save(Book book){return book;}
         };
         Comment old = new Comment(1,1,"Olha","Text",now.minus(Duration.ofHours(24)));
         CommentRepositoryPort comments = new CommentRepositoryPort() {
@@ -26,6 +27,7 @@ class CommentServiceTest {
             public Optional<Comment> findById(long id){return Optional.of(old);}
             public Comment add(long b,String a,String t,Instant c){throw new UnsupportedOperationException();}
             public boolean delete(long id){return true;}
+            public List<ua.edu.catalog.core.model.UserComment> findByUserId(long id){return List.of();}
         };
         CommentService service = new CommentService(books, comments, Clock.fixed(now, ZoneOffset.UTC));
         assertThrows(ConflictException.class, () -> service.delete(1));
