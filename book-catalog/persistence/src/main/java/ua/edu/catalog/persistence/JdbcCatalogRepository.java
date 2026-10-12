@@ -70,6 +70,23 @@ public class JdbcCatalogRepository implements CatalogRepositoryPort {
         }
     }
 
+    @Override
+    public Book save(Book book) {
+        String sql = "INSERT INTO books(title,author,pub_year) VALUES(?,?,?)";
+        try (Connection c = Db.get(); PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, book.title());
+            ps.setString(2, book.author());
+            ps.setInt(3, book.year());
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (!rs.next()) throw new SQLException("No generated id returned");
+                return new Book(rs.getLong(1), book.title(), book.author(), book.year());
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Database error while adding a book", e);
+        }
+    }
+
     private Search buildSearch(String term, String field) {
         if (term.isBlank()) return new Search("1=1", null, false);
 
