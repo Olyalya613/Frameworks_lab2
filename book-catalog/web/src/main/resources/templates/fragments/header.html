@@ -1,0 +1,6 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body><header th:fragment="header" class="top"><div class="wrap nav"><a class="brand" th:href="@{/books}" th:text="#{app.title}">Book Catalog</a><nav><a th:href="@{/books}" th:text="#{nav.books}">Books</a><a sec:authorize="hasRole('ADMIN')" th:href="@{/books/add}" th:text="#{form.add}">Add book</a><a th:href="@{/books(lang='uk')}">UA</a><a th:href="@{/books(lang='en')}">EN</a>
+<span sec:authorize="isAuthenticated()">Користувач <strong sec:authentication="name"></strong></span>
+<form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline">
+    <button type="submit">Вийти</button>
+</form>
+</nav></div></header></body></html>

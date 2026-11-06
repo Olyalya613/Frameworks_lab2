@@ -1,6 +1,7 @@
 package ua.edu.catalog.persistence;
 
 import ua.edu.catalog.core.model.Comment;
+import ua.edu.catalog.core.model.UserComment;
 import ua.edu.catalog.core.port.CommentRepositoryPort;
 
 import java.sql.*;
@@ -63,6 +64,25 @@ public class JdbcCommentRepository implements CommentRepositoryPort {
              PreparedStatement ps = c.prepareStatement("DELETE FROM comments WHERE id=?")) {
             ps.setLong(1, id);
             return ps.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new IllegalStateException("Database error while deleting comment", e);
+        }
+    }
+
+    @Override
+    public List<UserComment> findByUserId(long userId) {
+        // The legacy JDBC schema stores author names without user IDs.
+        return List.of();
+    }
+
+    @Override
+    public boolean delete(long bookId, long commentId) {
+        String sql = "DELETE FROM comments WHERE book_id=? AND id=?";
+        try (Connection connection = Db.get();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, bookId);
+            statement.setLong(2, commentId);
+            return statement.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new IllegalStateException("Database error while deleting comment", e);
         }

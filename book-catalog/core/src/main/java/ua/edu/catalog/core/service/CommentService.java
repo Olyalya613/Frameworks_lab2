@@ -1,6 +1,10 @@
 package ua.edu.catalog.core.service;
 
 import ua.edu.catalog.core.exception.ConflictException;
+import ua.edu.catalog.core.exception.BookNotFoundException;
+import ua.edu.catalog.core.exception.CommentTextTooLongException;
+import ua.edu.catalog.core.exception.CommentTooOldException;
+import ua.edu.catalog.core.exception.InvalidCommentDeleteException;
 import ua.edu.catalog.core.exception.NotFoundException;
 import ua.edu.catalog.core.model.Comment;
 import ua.edu.catalog.core.port.CatalogRepositoryPort;
@@ -39,8 +43,37 @@ public class CommentService {
         if (a.isEmpty()) throw new IllegalArgumentException("Author is required");
         if (t.isEmpty()) throw new IllegalArgumentException("Comment text is required");
         if (a.length() > 64) throw new IllegalArgumentException("Author must contain at most 64 characters");
-        if (t.length() > 1000) throw new IllegalArgumentException("Comment must contain at most 1000 characters");
+        if (t.length() > 1000) throw new CommentTextTooLongException();
         return comments.add(bookId, a, t, clock.instant());
+    }
+
+    public void delete(long bookId, long commentId, Instant createdAt) {
+        if (bookId <= 0 || commentId <= 0) {
+            throw new InvalidCommentDeleteException("Ідентифікатори книги й коментаря мають бути додатними");
+        }
+        if (createdAt == null) {
+            throw new InvalidCommentDeleteException("Укажіть дату створення коментаря");
+        }
+        Instant now = clock.instant();
+        if (createdAt.isAfter(now)) {
+            throw new InvalidCommentDeleteException("Дата створення коментаря не може бути в майбутньому");
+        }
+        Instant cutoff = now.minus(DELETE_WINDOW);
+        if (createdAt.isBefore(cutoff)) {
+            throw new CommentTooOldException();
+        }
+
+        ensureBook(bookId);
+        Comment comment = comments.findById(commentId)
+                .filter(candidate -> candidate.bookId() == bookId)
+                .orElseThrow(() -> new NotFoundException("Коментар цієї книги не знайдено"));
+        // The database timestamp is authoritative even if the client supplies a recent date.
+        if (comment.createdAt().isBefore(cutoff)) {
+            throw new CommentTooOldException();
+        }
+        if (!comments.delete(bookId, commentId)) {
+            throw new NotFoundException("Коментар цієї книги не знайдено");
+        }
     }
 
     public Comment delete(long commentId) {
@@ -57,6 +90,6 @@ public class CommentService {
 
     private void ensureBook(long bookId) {
         if (bookId <= 0) throw new IllegalArgumentException("Book id must be positive");
-        if (catalog.findById(bookId).isEmpty()) throw new NotFoundException("Book not found");
+        if (catalog.findById(bookId).isEmpty()) throw new BookNotFoundException();
     }
 }
