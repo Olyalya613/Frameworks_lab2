@@ -1,6 +1,7 @@
 package ua.edu.catalog.persistence;
 
 import ua.edu.catalog.core.model.Comment;
+import ua.edu.catalog.core.model.UserComment;
 import ua.edu.catalog.core.port.CommentRepositoryPort;
 
 import java.sql.*;
@@ -66,6 +67,12 @@ public class JdbcCommentRepository implements CommentRepositoryPort {
         } catch (SQLException e) {
             throw new IllegalStateException("Database error while deleting comment", e);
         }
+    }
+
+    @Override
+    public List<UserComment> findByUserId(long userId) {
+        // The legacy JDBC schema stores author names without user IDs.
+        return List.of();
     }
 
     private Comment map(ResultSet rs) throws SQLException {

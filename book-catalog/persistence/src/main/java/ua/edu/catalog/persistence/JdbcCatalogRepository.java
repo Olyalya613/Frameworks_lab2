@@ -70,6 +70,53 @@ public class JdbcCatalogRepository implements CatalogRepositoryPort {
         }
     }
 
+
+    @Override
+    public Book save(Book book) {
+        boolean insert = book.id() == 0;
+        String sql = insert
+                ? "INSERT INTO books(title, author, pub_year) VALUES (?, ?, ?)"
+                : "UPDATE books SET title=?, author=?, pub_year=? WHERE id=?";
+        try (Connection c = Db.get();
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, book.title());
+            ps.setString(2, book.author());
+            ps.setInt(3, book.year());
+            if (!insert) ps.setLong(4, book.id());
+            if (ps.executeUpdate() == 0) {
+                throw new ua.edu.catalog.core.exception.NotFoundException("Book not found");
+            }
+            if (!insert) return book;
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (!keys.next()) throw new SQLException("Missing generated book id");
+                return new Book(keys.getLong(1), book.title(), book.author(), book.year());
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Database error while saving a book", e);
+        }
+    }
+
+    @Override
+    public boolean delete(long id) {
+        try (Connection c = Db.get()) {
+            c.setAutoCommit(false);
+            try (PreparedStatement comments = c.prepareStatement("DELETE FROM comments WHERE book_id=?");
+                 PreparedStatement book = c.prepareStatement("DELETE FROM books WHERE id=?")) {
+                comments.setLong(1, id);
+                comments.executeUpdate();
+                book.setLong(1, id);
+                boolean deleted = book.executeUpdate() > 0;
+                c.commit();
+                return deleted;
+            } catch (SQLException e) {
+                c.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Database error while deleting a book", e);
+        }
+    }
+
     private Search buildSearch(String term, String field) {
         if (term.isBlank()) return new Search("1=1", null, false);
 

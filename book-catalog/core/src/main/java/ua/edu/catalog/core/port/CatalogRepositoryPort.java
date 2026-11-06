@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface CatalogRepositoryPort {
     Page<Book> find(String q, String field, PageRequest request);
     Optional<Book> findById(long id);
+    Book save(Book book);
+    boolean delete(long id);
 }

@@ -24,6 +24,30 @@ public class CatalogService {
         return repository.find(q == null ? "" : q.trim(), safeField, new PageRequest(page, size, safeSort));
     }
 
+    public Book create(String title, String author, int year) {
+        return save(0, title, author, year);
+    }
+
+    public Book update(long id, String title, String author, int year) {
+        if (id <= 0) throw new IllegalArgumentException("Book id must be positive");
+        return save(id, title, author, year);
+    }
+
+    public void delete(long id) {
+        if (!repository.delete(id)) throw new NotFoundException("Book not found");
+    }
+
+    private Book save(long id, String title, String author, int year) {
+        String safeTitle = title == null ? "" : title.trim();
+        String safeAuthor = author == null ? "" : author.trim();
+        if (safeTitle.isBlank()) throw new IllegalArgumentException("Book title is required");
+        if (safeAuthor.isBlank()) throw new IllegalArgumentException("Book author is required");
+        if (safeTitle.length() > 255) throw new IllegalArgumentException("Book title is too long");
+        if (safeAuthor.length() > 255) throw new IllegalArgumentException("Book author is too long");
+        if (year < 1 || year > 2100) throw new IllegalArgumentException("Book year must be between 1 and 2100");
+        return repository.save(new Book(id, safeTitle, safeAuthor, year));
+    }
+
     public Book get(long id) {
         if (id <= 0) throw new IllegalArgumentException("Book id must be positive");
         return repository.findById(id).orElseThrow(() -> new NotFoundException("Book not found"));
