@@ -13,8 +13,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-          cache: maven
-          cache-dependency-path: Kompleksna_Spring_Render_project/book-catalog/**/pom.xm
+          
       - name: Run all module tests
         working-directory: Kompleksna_Spring_Render_project/book-catalog
         run: mvn -B -ntp test
