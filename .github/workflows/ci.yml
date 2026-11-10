@@ -1,0 +1,74 @@
+name: Spring Boot CI
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: Kompleksna_Spring_Render_project/book-catalog/**/pom.xm
+      - name: Run all module tests
+        working-directory: Kompleksna_Spring_Render_project/book-catalog
+        run: mvn -B -ntp test
+      - name: Package executable web JAR
+        working-directory: Kompleksna_Spring_Render_project/book-catalog
+        run: mvn -B -ntp package -pl web -am -DskipTests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book-catalog-web
+          path: Kompleksna_Spring_Render_project/book-catalog/web/target/web-1.0-SNAPSHOT.jar
+          if-no-files-found: error
+
+  postgres-smoke:
+    needs: build
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: catalog_ci
+          POSTGRES_USER: catalog_ci
+          POSTGRES_PASSWORD: ephemeral-ci-db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U catalog_ci -d catalog_ci"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/download-artifact@v4
+        with:
+          name: book-catalog-web
+      - name: Start prod against PostgreSQL and verify Actuator
+        env:
+          SPRING_PROFILES_ACTIVE: prod
+          SPRING_DATASOURCE_URL: jdbc:postgresql://127.0.0.1:5432/catalog_ci
+          SPRING_DATASOURCE_USERNAME: catalog_ci
+          SPRING_DATASOURCE_PASSWORD: ephemeral-ci-db
+          APP_ADMIN_PASSWORD: ephemeral-ci-admin-only
+        run: |
+          java -jar web-1.0-SNAPSHOT.jar > app.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for attempt in {1..60}; do
+            if curl -fsS http://127.0.0.1:8080/actuator/health | jq -e '.status == "UP"'; then
+              exit 0
+            fi
+            kill -0 "$pid" 2>/dev/null || break
+            sleep 2
+          done
+          cat app.log
+          exit 1
