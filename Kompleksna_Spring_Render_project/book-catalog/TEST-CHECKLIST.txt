@@ -1,0 +1,9 @@
+Лабораторна робота №10
+
+[ ] mvn clean verify — core і web.
+[ ] ADMIN додає й видаляє свіжий коментар — POST 204.
+[ ] bookId=0 — POST 400 + JSON error.
+[ ] createdAt понад 24 години тому — POST 400 + JSON error.
+[ ] Невідома книга з поточною датою — POST 404 + JSON error.
+[ ] USER не може видаляти коментарі.
+[ ] PowerShell містить повідомлення AOP із часом виконання.

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Книга</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6f8;color:#1f2937}main{max-width:800px;margin:40px auto;background:#fff;padding:28px;border-radius:14px}
+input,textarea,button{box-sizing:border-box;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font:inherit}
+input,textarea{display:block;width:100%;margin:8px 0}textarea{min-height:100px}.comment{border-bottom:1px solid #e5e7eb;padding:14px 0}
+.error{color:#b91c1c}.success{color:#15803d}a{color:#2563eb}
+</style>
+</head>
+<body><main>
+<a href="/">← До каталогу</a><h1 id="title">Книга</h1><div id="meta"></div>
+<h2>Відгуки</h2><div id="comments">Завантаження...</div>
+<h3>Додати відгук</h3>
+<form id="form"><input id="author" name="author" maxlength="64" required placeholder="Ваше ім'я">
+<textarea id="text" name="text" maxlength="1000" required placeholder="Текст відгуку"></textarea>
+<button>Додати</button></form><p id="message"></p>
+</main>
+<script>
+const id=new URLSearchParams(location.search).get('id');
+const title=document.getElementById('title'),meta=document.getElementById('meta'),
+comments=document.getElementById('comments'),form=document.getElementById('form'),
+author=document.getElementById('author'),text=document.getElementById('text'),message=document.getElementById('message');
+async function load(){
+ try{
+  const r=await fetch('/api/books/'+id),d=await r.json();
+  if(!r.ok){title.textContent=d.error?.message||'Помилка';return}
+  title.textContent=d.book.title;meta.textContent=d.book.author+' · '+d.book.year;
+  comments.innerHTML=d.comments.length?d.comments.map(c=>`<div class="comment"><b>${esc(c.author)}</b><p>${esc(c.text)}</p><small>${new Date(c.createdAt).toLocaleString('uk-UA')}</small><br><button onclick="removeComment(${c.id})">Видалити</button></div>`).join(''):'Відгуків ще немає.';
+ }catch(e){comments.textContent='Не вдалося завантажити дані.';console.error(e)}
+}
+form.addEventListener('submit',async e=>{
+ e.preventDefault();message.textContent='';
+ const body=new URLSearchParams({author:author.value.trim(),text:text.value.trim()});
+ try{
+  const r=await fetch('/api/books/'+id+'/comments',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body});
+  if(!r.ok){const d=await r.json();message.className='error';message.textContent=d.error?.message||'Помилка';return}
+  message.className='success';message.textContent='Відгук додано.';form.reset();await load();
+ }catch(e){message.className='error';message.textContent='Помилка з’єднання.'}
+});
+async function removeComment(cid){
+ const r=await fetch('/api/comments/'+cid,{method:'DELETE'});
+ if(!r.ok){const d=await r.json();alert(d.error?.message||'Помилка видалення');return}
+ await load();
+}
+function esc(v){const d=document.createElement('div');d.textContent=v;return d.innerHTML}
+if(!id){title.textContent='Не вказано id книги';form.style.display='none'}else load();
+</script></body></html>

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Каталог книг</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;color:#1f2937}
+main{max-width:950px;margin:40px auto;background:white;padding:28px;border-radius:14px;box-shadow:0 6px 24px #0001}
+form{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+input,select,button{padding:10px;border:1px solid #cbd5e1;border-radius:8px;font:inherit}
+input{flex:1;min-width:220px}button{cursor:pointer}
+.book{padding:16px 4px;border-bottom:1px solid #e5e7eb}.book a{font-weight:700;color:#2563eb;text-decoration:none}
+.muted{color:#64748b}.error{color:#b91c1c}.ok{color:#15803d}.pager{margin-top:18px}
+</style>
+</head>
+<body>
+<main>
+<h1>Каталог книг</h1>
+
+<form id="searchForm">
+  <input id="queryInput" name="q" placeholder="Введіть назву, автора або рік">
+  <select id="fieldSelect" name="field">
+    <option value="all">Усюди</option>
+    <option value="title">За назвою</option>
+    <option value="author">За автором</option>
+    <option value="year">За роком</option>
+  </select>
+  <select id="sortSelect" name="sort">
+    <option value="title">Сортувати: назва</option>
+    <option value="author">Сортувати: автор</option>
+    <option value="year">Сортувати: рік</option>
+  </select>
+  <button type="submit">Знайти</button>
+  <button type="button" id="resetButton">Скинути</button>
+</form>
+
+<div id="status"></div>
+<div id="books"></div>
+<div id="pager" class="pager"></div>
+</main>
+
+<script>
+"use strict";
+
+const form = document.getElementById("searchForm");
+const queryInput = document.getElementById("queryInput");
+const fieldSelect = document.getElementById("fieldSelect");
+const sortSelect = document.getElementById("sortSelect");
+const resetButton = document.getElementById("resetButton");
+const statusBox = document.getElementById("status");
+const booksBox = document.getElementById("books");
+const pagerBox = document.getElementById("pager");
+let currentPage = 0;
+
+form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    currentPage = 0;
+    loadBooks();
+});
+
+resetButton.addEventListener("click", function () {
+    queryInput.value = "";
+    fieldSelect.value = "all";
+    sortSelect.value = "title";
+    currentPage = 0;
+    loadBooks();
+});
+
+async function loadBooks() {
+    statusBox.className = "";
+    statusBox.textContent = "Пошук...";
+    booksBox.innerHTML = "";
+    pagerBox.innerHTML = "";
+
+    const params = new URLSearchParams();
+    params.set("q", queryInput.value.trim());
+    params.set("field", fieldSelect.value);
+    params.set("page", String(currentPage));
+    params.set("size", "5");
+    params.set("sort", sortSelect.value);
+
+    try {
+        const response = await fetch("/api/books?" + params.toString(), {
+            method: "GET",
+            headers: {"Accept": "application/json"}
+        });
+
+        const raw = await response.text();
+        let data;
+        try {
+            data = raw ? JSON.parse(raw) : {};
+        } catch (e) {
+            throw new Error("Сервер повернув не JSON. HTTP " + response.status);
+        }
+
+        if (!response.ok) {
+            throw new Error(data.error?.message || ("HTTP " + response.status));
+        }
+
+        statusBox.className = "ok";
+        statusBox.textContent = "Знайдено: " + data.totalElements;
+
+        if (!data.items || data.items.length === 0) {
+            booksBox.innerHTML = "<p>Нічого не знайдено.</p>";
+        } else {
+            for (const book of data.items) {
+                const row = document.createElement("div");
+                row.className = "book";
+
+                const link = document.createElement("a");
+                link.href = "/book.html?id=" + encodeURIComponent(book.id);
+                link.textContent = book.title;
+
+                const meta = document.createElement("div");
+                meta.className = "muted";
+                meta.textContent = book.author + " · " + book.year;
+
+                row.appendChild(link);
+                row.appendChild(meta);
+                booksBox.appendChild(row);
+            }
+        }
+
+        const pageText = document.createElement("span");
+        pageText.textContent = "Сторінка " + (data.page + 1) + " з " + Math.max(data.totalPages, 1) + " ";
+
+        const prev = document.createElement("button");
+        prev.type = "button";
+        prev.textContent = "←";
+        prev.disabled = currentPage <= 0;
+        prev.addEventListener("click", function () {
+            if (currentPage > 0) {
+                currentPage--;
+                loadBooks();
+            }
+        });
+
+        const next = document.createElement("button");
+        next.type = "button";
+        next.textContent = "→";
+        next.disabled = currentPage + 1 >= data.totalPages;
+        next.addEventListener("click", function () {
+            if (currentPage + 1 < data.totalPages) {
+                currentPage++;
+                loadBooks();
+            }
+        });
+
+        pagerBox.appendChild(pageText);
+        pagerBox.appendChild(prev);
+        pagerBox.appendChild(next);
+    } catch (error) {
+        console.error(error);
+        statusBox.className = "error";
+        statusBox.textContent = "Помилка: " + error.message;
+    }
+}
+
+loadBooks();
+</script>
+</body>
+</html>
